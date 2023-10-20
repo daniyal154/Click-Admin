@@ -20,7 +20,7 @@ export const AccountPopover = (props) => {
   useEffect(() => {
     let userData = apiManager._getUser();
     setUser(userData);
-  });
+  }, []);
 
   return (
     <Popover

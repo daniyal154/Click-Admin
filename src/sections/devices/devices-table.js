@@ -33,6 +33,8 @@ import { Cancel } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
+import ApiManager from "src/api/apiManager";
+
 const ITEM_HEIGHT = 48;
 
 export const DeviceTable = (props) => {
@@ -45,6 +47,7 @@ export const DeviceTable = (props) => {
     rowsPerPage = 0,
     selected = [],
   } = props;
+  const apiManager = ApiManager.getInstance();
   const [open, setOpen] = useState(false);
   const [deleteID, setDeleteID] = useState(0);
 
@@ -69,11 +72,11 @@ export const DeviceTable = (props) => {
       if (data.responseCode == 200) {
         removeObjectWithId(deleteID);
         setDeleteID(0);
-      }else{
+      } else {
         toast.error("Something Went Wrong", {
-					position: toast.POSITION.TOP_RIGHT,
-					theme: "colored",
-				});
+          position: toast.POSITION.TOP_RIGHT,
+          theme: "colored",
+        });
       }
       setOpen(false);
     });
@@ -81,7 +84,7 @@ export const DeviceTable = (props) => {
 
   const handleSwitch = (e, id) => {
     apiManager
-      .post("/device/freezeUnfreeze", { status: e.target.checked, user_id: id })
+      .post("/device/freezeUnfreeze", { status: e.target.checked, device_id: id })
       .then((data) => {
         console.log(data);
       });
@@ -108,6 +111,7 @@ export const DeviceTable = (props) => {
                 </TableCell> */}
                 <TableCell>Id</TableCell>
                 <TableCell>Name</TableCell>
+                <TableCell>Button</TableCell>
                 <TableCell>User</TableCell>
                 <TableCell>Freeze</TableCell>
                 <TableCell>Action</TableCell>
@@ -124,6 +128,7 @@ export const DeviceTable = (props) => {
                   <TableRow hover key={user.id} selected={isSelected}>
                     <TableCell padding="checkbox">{user.id}</TableCell>
                     <TableCell> {user.device_name}</TableCell>
+                    <TableCell> {user.button}</TableCell>
                     <TableCell>{user?.user?.name}</TableCell>
                     <TableCell>
                       <Switch

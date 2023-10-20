@@ -33,7 +33,7 @@ export const DeviceAddForm = () => {
           });
           setErrors(errArr);
         } else {
-          toast.error("Something Went Wrong", {
+          toast.error(data?.responseData?.error ?? "Something Went Wrong", {
             position: toast.POSITION.TOP_RIGHT,
             theme: "colored",
           });

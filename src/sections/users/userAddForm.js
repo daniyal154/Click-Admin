@@ -28,7 +28,7 @@ export const UserAddForm = (props) => {
     setErrors({});
     apiManager.post("/users", { ...values }).then((data) => {
       if (data.responseCode == 200) {
-        location.reload;
+        location.reload();
       } else {
         if (data.message == 5001) {
           let err = data.errors.errors;
@@ -37,7 +37,7 @@ export const UserAddForm = (props) => {
             errArr[value.path] = value.msg;
           });
           setErrors(errArr);
-        }else{
+        } else {
           toast.error("Something Went Wrong", {
             position: toast.POSITION.TOP_RIGHT,
             theme: "colored",
