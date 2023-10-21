@@ -13,8 +13,10 @@ import {
   Unstable_Grid2 as Grid,
 } from "@mui/material";
 import ApiManager from "src/api/apiManager";
+import { toast } from "react-toastify";
 let apiManager = ApiManager.getInstance();
 export const UserEditForm = (props) => {
+  const [errors, setErrors] = useState({});
   const [values, setValues] = useState({
     name: "",
     username: "",
@@ -23,19 +25,33 @@ export const UserEditForm = (props) => {
     role: 0,
   });
   useEffect(() => {
-    console.log(props.user)
+    console.log(props.user);
     if (props.id) {
       let user = { ...props.user };
-      
+
       user.allowed_devices = props?.user?.device_limit;
       setValues(user);
     }
   }, [props.user]);
   const handleSubmit = () => {
-    apiManager.patch("/users/"+props.id, { ...values }).then((data) => {
-      if (data.message == 200) {
-        location.reload;
+    setErrors({});
+    apiManager.patch("/users/" + props.id, { ...values }).then((data) => {
+      if (data.responseCode == 200) {
+        location.reload();
       } else {
+        if (data.message == 5001) {
+          let err = data.errors.errors;
+          let errArr = [];
+          err.map((value, index) => {
+            errArr[value.path] = value.msg;
+          });
+          setErrors(errArr);
+        } else {
+          toast.error("Something Went Wrong", {
+            position: toast.POSITION.TOP_RIGHT,
+            theme: "colored",
+          });
+        }
       }
     });
   };
@@ -45,8 +61,8 @@ export const UserEditForm = (props) => {
       [event.target.name]: event.target.value,
     }));
 
-    if(event.target.name == "password" && event.target.value == ""){
-      let user = {...values};
+    if (event.target.name == "password" && event.target.value == "") {
+      let user = { ...values };
       delete user["password"];
       setValues(user);
     }
@@ -62,7 +78,8 @@ export const UserEditForm = (props) => {
               <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
-                  helperText="Please specify the Name"
+                  error={errors.name ? true : false}
+                  helperText={errors?.name && errors?.name}
                   label="Name"
                   name="name"
                   onChange={handleChange}
@@ -74,6 +91,8 @@ export const UserEditForm = (props) => {
               <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
+                  error={errors.allowed_devices ? true : false}
+                  helperText={errors?.allowed_devices && errors?.allowed_devices}
                   label="Devices Allowed"
                   name="allowed_devices"
                   onChange={handleChange}
@@ -85,6 +104,8 @@ export const UserEditForm = (props) => {
               <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
+                  error={errors.password ? true : false}
+                  helperText={errors?.password && errors?.password}
                   label="Password"
                   name="password"
                   onChange={handleChange}

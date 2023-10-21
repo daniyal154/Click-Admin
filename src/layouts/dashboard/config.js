@@ -10,15 +10,15 @@ import { Computer, Phone } from '@mui/icons-material';
 import { SvgIcon } from '@mui/material';
 
 export const items = [
-  // {
-  //   title: 'Overview',
-  //   path: '/',
-  //   icon: (
-  //     <SvgIcon fontSize="small">
-  //       <ChartBarIcon />
-  //     </SvgIcon>
-  //   )
-  // },
+  {
+    title: 'Overview',
+    path: '/',
+    icon: (
+      <SvgIcon fontSize="small">
+        <ChartBarIcon />
+      </SvgIcon>
+    )
+  },
   {
     title: 'Users',
     path: '/users',

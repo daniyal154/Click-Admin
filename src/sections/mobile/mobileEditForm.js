@@ -15,6 +15,7 @@ import {
 import ApiManager from "src/api/apiManager";
 let apiManager = ApiManager.getInstance();
 export const MobileEditForm = (props) => {
+  const [errors, setErrors] = useState({});
   const [values, setValues] = useState({
     name: "",
     password: "",
@@ -26,10 +27,24 @@ export const MobileEditForm = (props) => {
     }
   }, [props.mobile]);
   const handleSubmit = () => {
+    setErrors({});
     apiManager.patch("/mobile/" + props.id, { ...values }).then((data) => {
-      if (data.message == 200) {
-        location.reload;
+      if (data.responseCode == 200) {
+        location.reload();
       } else {
+        if (data.message == 5001) {
+          let err = data.errors.errors;
+          let errArr = [];
+          err.map((value, index) => {
+            errArr[value.path] = value.msg;
+          });
+          setErrors(errArr);
+        } else {
+          toast.error("Something Went Wrong", {
+            position: toast.POSITION.TOP_RIGHT,
+            theme: "colored",
+          });
+        }
       }
     });
   };
@@ -56,7 +71,8 @@ export const MobileEditForm = (props) => {
               <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
-                  helperText="Please specify the Name"
+                  error={errors.name ? true : false}
+                  helperText={errors?.name && errors?.name}
                   label="Name"
                   name="name"
                   onChange={handleChange}
@@ -68,6 +84,8 @@ export const MobileEditForm = (props) => {
               <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
+                  error={errors.password ? true : false}
+                  helperText={errors?.password && errors?.password}
                   label="Password"
                   name="password"
                   onChange={handleChange}

@@ -29,7 +29,7 @@ import {
 import { Scrollbar } from "src/components/scrollbar";
 import { getInitials } from "src/utils/get-initials";
 import { useState } from "react";
-import { Cancel } from "@mui/icons-material";
+import { Cancel, Circle } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
@@ -43,49 +43,10 @@ export const DeviceTableDashboard = (props) => {
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 0,
+    online=[],
     selected = [],
   } = props;
-  const [open, setOpen] = useState(false);
-  const [deleteID, setDeleteID] = useState(0);
 
-  const handleClose = () => {
-    setDeleteID(0);
-    setOpen(false);
-  };
-
-  const deleteDevice = (id) => {
-    setDeleteID(id);
-    setOpen(true);
-  };
-  const removeObjectWithId = (id) => {
-    let newArr = [...items];
-    newArr = newArr.filter(function (obj) {
-      return obj.id !== id;
-    });
-    setItems(newArr);
-  };
-  const handleSubmit = () => {
-    apiManager.delete("/device/" + deleteID).then((data) => {
-      if (data.responseCode == 200) {
-        removeObjectWithId(deleteID);
-        setDeleteID(0);
-      }else{
-        toast.error("Something Went Wrong", {
-					position: toast.POSITION.TOP_RIGHT,
-					theme: "colored",
-				});
-      }
-      setOpen(false);
-    });
-  };
-
-  const handleSwitch = (e, id) => {
-    apiManager
-      .post("/device/freezeUnfreeze", { status: e.target.checked, user_id: id })
-      .then((data) => {
-        console.log(data);
-      });
-  };
   return (
     <Card>
       <Scrollbar>
@@ -109,8 +70,7 @@ export const DeviceTableDashboard = (props) => {
                 <TableCell>Id</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>User</TableCell>
-                <TableCell>Freeze</TableCell>
-                <TableCell>Action</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -125,24 +85,11 @@ export const DeviceTableDashboard = (props) => {
                     <TableCell padding="checkbox">{user.id}</TableCell>
                     <TableCell> {user.device_name}</TableCell>
                     <TableCell>{user?.user?.name}</TableCell>
+                    
                     <TableCell>
-                      <Switch
-                        defaultChecked={user.status == 2}
-                        onChange={(e) => handleSwitch(e, user.id)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Link href={"/devices/" + user.id}>
-                        <IconButton tooltip="Edit User">
-                          <EditIcon sx={{ marginRight: "5px", color: "black" }} />
-                        </IconButton>
-                      </Link>
-                      <IconButton tooltip="Delete User">
-                        <DeleteIcon
-                          sx={{ color: "black" }}
-                          onClick={(e) => deleteDevice(user.id)}
-                        />
-                      </IconButton>
+                      {online?.includes(user.id) ? (
+                        <Circle sx ={{ color:'success.main' }}/>
+                      ) : (<Circle sx={{ color: "error.main"}} />)}
                     </TableCell>
                   </TableRow>
                 );
@@ -150,30 +97,7 @@ export const DeviceTableDashboard = (props) => {
             </TableBody>
           </Table>
         </Box>
-      </Scrollbar>
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Are You Sure you want to delete?"}</DialogTitle>
-        <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleSubmit} autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
-      </Dialog>
+      </Scrollbar>  
     </Card>
   );
 };

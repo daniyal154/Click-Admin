@@ -33,6 +33,7 @@ let apiManager = ApiManager.getInstance();
 const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [user, setUser] = useState({});
   let router = useRouter();
   // const customers = useCustomers(page, rowsPerPage);
   // const customersIds = useCustomerIds(customers);
@@ -44,6 +45,7 @@ const Page = () => {
 
   useEffect(() => {
     let userData = apiManager._getTokenUser();
+    setUser(userData);
     if (userData.role != 1) {
       router.push("/");
     }
@@ -51,7 +53,7 @@ const Page = () => {
       if (arrData.responseCode == 200) {
         let newData = arrData.responseData;
         setData(newData?.users);
-      }else{
+      } else {
         toast.error("Something Went Wrong", {
           position: toast.POSITION.TOP_RIGHT,
           theme: "colored",
@@ -81,20 +83,24 @@ const Page = () => {
               <Stack spacing={1}>
                 <Typography variant="h4">Users</Typography>
               </Stack>
-              <div>
-                <Link href={"/users/add"}>
-                  <Button
-                    startIcon={
-                      <SvgIcon fontSize="small">
-                        <PlusIcon />
-                      </SvgIcon>
-                    }
-                    variant="contained"
-                  >
-                    Add
-                  </Button>
-                </Link>
-              </div>
+              {user.role == 1 ? (
+                <div>
+                  <Link href={"/users/add"}>
+                    <Button
+                      startIcon={
+                        <SvgIcon fontSize="small">
+                          <PlusIcon />
+                        </SvgIcon>
+                      }
+                      variant="contained"
+                    >
+                      Add
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <></>
+              )}
             </Stack>
 
             <UsersTable

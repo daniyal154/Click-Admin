@@ -79,7 +79,7 @@ export const UsersTable = (props) => {
       if (data.responseCode == 200) {
         removeObjectWithId(deleteID);
         setDeleteID(0);
-      }else{
+      } else {
         toast.error("Something Went Wrong", {
           position: toast.POSITION.TOP_RIGHT,
           theme: "colored",
@@ -90,7 +90,17 @@ export const UsersTable = (props) => {
   };
   const handleSwitch = (e, id) => {
     apiManager.post("/freezeUnfreeze", { status: e.target.checked, user_id: id }).then((data) => {
-      console.log(data);
+      if (data.responseCode == 200) {
+        let newArr = [...items];
+        newArr[id].status = value ? 2 : 1;
+        setItems(newArr);
+      } else {
+        toast.error(data?.responseData?.error ?? "Something Went Wrong", {
+          position: toast.POSITION.TOP_RIGHT,
+          theme: "colored",
+        });
+        return false;
+      }
     });
   };
   return (
@@ -148,20 +158,22 @@ export const UsersTable = (props) => {
                     </TableCell>
                     <TableCell>{ROLES[user.role]}</TableCell>
                     <TableCell>
-                      {user.role != 1 && user?.devices?.length < 1 ? (
-                        <>
-                          <Link href={"/users/" + user.id}>
-                            <IconButton tooltip="Edit User">
-                              <EditIcon sx={{ marginRight: "5px", color: "black" }} />
-                            </IconButton>
-                          </Link>
-                          <IconButton tooltip="Delete User">
-                            <DeleteIcon
-                              sx={{ color: "black" }}
-                              onClick={(e) => deleteUser(user.id)}
-                            />
+                      {user.role != 1 ? (
+                        <Link href={"/users/" + user.id}>
+                          <IconButton tooltip="Edit User">
+                            <EditIcon sx={{ marginRight: "5px", color: "black" }} />
                           </IconButton>
-                        </>
+                        </Link>
+                      ) : (
+                        <></>
+                      )}
+                      {user.role != 1 && user?.devices?.length < 1 ? (
+                        <IconButton tooltip="Delete User">
+                          <DeleteIcon
+                            sx={{ color: "black" }}
+                            onClick={(e) => deleteUser(user.id)}
+                          />
+                        </IconButton>
                       ) : (
                         <></>
                       )}

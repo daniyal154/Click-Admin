@@ -46,6 +46,7 @@ export const DeviceTable = (props) => {
     page = 0,
     rowsPerPage = 0,
     selected = [],
+    setItems
   } = props;
   const apiManager = ApiManager.getInstance();
   const [open, setOpen] = useState(false);
@@ -82,11 +83,22 @@ export const DeviceTable = (props) => {
     });
   };
 
-  const handleSwitch = (e, id) => {
+  const handleSwitch = (e, user,id) => {
+    let value = e.target.checked;
     apiManager
-      .post("/device/freezeUnfreeze", { status: e.target.checked, device_id: id })
+      .post("/device/freezeUnfreeze", { status: value, device_id: user.id,user_id:user.user_id })
       .then((data) => {
-        console.log(data);
+        if(data.responseCode == 200){
+          let newArr = [...items];
+          newArr[id].status = value ? 2 : 1;
+          setItems(newArr);
+        }else{
+          toast.error(data?.responseData?.error ?? "Something Went Wrong", {
+            position: toast.POSITION.TOP_RIGHT,
+            theme: "colored",
+          });
+          return false;
+        }
       });
   };
   return (
@@ -118,7 +130,7 @@ export const DeviceTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {items?.map((user) => {
+              {items?.map((user,id) => {
                 const isSelected = selected.includes(user.id);
                 {
                   /* const createdAt = format(customer.createdAt, 'dd/MM/yyyy'); */
@@ -132,8 +144,9 @@ export const DeviceTable = (props) => {
                     <TableCell>{user?.user?.name}</TableCell>
                     <TableCell>
                       <Switch
-                        defaultChecked={user.status == 2}
-                        onChange={(e) => handleSwitch(e, user.id)}
+                        // defaultChecked={user.status == 2}
+                        onChange={(e) => handleSwitch(e, user,id)}
+                        checked={user.status == 2}
                       />
                     </TableCell>
                     <TableCell>

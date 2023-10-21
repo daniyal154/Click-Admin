@@ -1,6 +1,7 @@
 import { React } from "react";
 import axios from "axios";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import { verifyToken } from "src/utils/verifyToken";
 export default class ApiManager {
   static POST = "POST";
   static GET = "GET";
@@ -20,7 +21,7 @@ export default class ApiManager {
       : null;
   tokenUser =
     typeof window !== "undefined" && localStorage.getItem("ClickAppToken")
-      ? jwt.verify(localStorage.getItem("ClickAppToken"), this.secretKey)
+      ? verifyToken(localStorage.getItem("ClickAppToken"))
       : null;
 
   //returns instance of this class
@@ -132,8 +133,8 @@ export default class ApiManager {
   // };
 
   generateEndpointUrl = (endpoint) => {
-    return "http://localhost:5001/api" + endpoint;
-    // return "http://finance.tecsofiy.com/api/v1" + endpoint;
+    // return "http://localhost:5001/api" + endpoint;
+    return "http://app.tecsofiy.com:5010/api" + endpoint;
   };
 
   //convert object to GET params
@@ -210,9 +211,9 @@ export default class ApiManager {
     this.tokenUser = jwt.verify(token, this.secretKey);
   };
 
-  _getTokenUser = ()=> {
+  _getTokenUser = () => {
     return this.tokenUser;
-  }
+  };
 
   // setting token without encoded
   _setActualToken = (token) => (this.token = token);
@@ -237,4 +238,6 @@ export default class ApiManager {
   _getUser = () => {
     return JSON.parse(this.user);
   };
+
+  
 }
